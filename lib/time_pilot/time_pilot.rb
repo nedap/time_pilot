@@ -1,17 +1,5 @@
 module TimePilot
 
-  class Configuration
-    attr_reader :features
-
-    def initialize
-      @features = []
-    end
-
-    def feature feature_name
-      @features.push(feature_name)
-    end
-  end
-
   def self.configure
     @config = Configuration.new
     yield @config
@@ -36,6 +24,10 @@ module TimePilot
     @config.features
   end
 
+  def self.redis
+    @config.redis_store
+  end
+
   module Features
     def self.included(base)
       base.send :extend, ClassMethods
@@ -49,19 +41,20 @@ module TimePilot
     end
 
     def pilot_enable_feature(feature_name)
-      $redis.sadd "timepilot:#{feature_name}:#{self.class.to_s.downcase}_ids", id
+      TimePilot.redis.sadd "timepilot:#{feature_name}:#{self.class.to_s.downcase}_ids", id
     end
 
     def pilot_disable_feature(feature_name)
-      $redis.srem "timepilot:#{feature_name}:#{self.class.to_s.downcase}_ids", id
+      TimePilot.redis.srem "timepilot:#{feature_name}:#{self.class.to_s.downcase}_ids", id
     end
 
     def pilot_feature_enabled?(feature_name)
       self.class.time_pilot_groups.each do |group|
         method = group.to_s == self.class.to_s.downcase ? 'id' : group + '_id'
-        return true if $redis.sismember "timepilot:#{feature_name}:#{group}_ids", send(method)
+        return true if TimePilot.redis.sismember "timepilot:#{feature_name}:#{group}_ids", send(method)
       end
       false
     end
   end
+
 end

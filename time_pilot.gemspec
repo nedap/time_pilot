@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
   s.platform     = Gem::Platform::RUBY
   s.license      = 'MIT'
 
-  s.files        = ['time_pilot.rb']
+  s.files        = ['lib/time_pilot.rb']
   s.require_path = '.'
 
   s.authors     = ['@mlangenberg', '@markoudev']

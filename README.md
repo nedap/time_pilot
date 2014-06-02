@@ -1,24 +1,89 @@
-# TimePilot
+# TimePilot ![Build Status](https://magnum.travis-ci.com/nedap/time_pilot.svg?token=xp5ywq16hRcpzRui8vVa&branch=master) ![Code Climate](https://codeclimate.com/repos/538c225ae30ba00d55006394/badges/1741b217ec9818699a37/gpa.png)
+
+TimePilot is a RubyGem that makes it possible to define features that can be enabled for a certain group of users. It requires very little configuration, and is designed to work stand-alone on any object. TimePilot uses Redis for storage.
+
+## Installation
+
+Add this line to your application's Gemfile:
+
+    gem 'time_pilot'
+
+And then execute:
+
+    $ bundle
+
+Or install it yourself as:
+
+    $ gem install time_pilot
 
 # Configuration
 
+The features that you want to specify need to be added in an initializer as such:
+
 ```ruby
+# config/initializers/time_pilot.rb
 TimePilot.configure do |c|
   c.feature :planning
   c.feature :private_messaging
 end
 ```
 
+Using this configuration, the `TimePilot::Features` module is enriched with three methods per feature at boot time: `{feature}_enabled?`, `enable_{feature}` and `disable_{feature}`. In every model that you would want to invoke these methods, i.e. check if a feature is enabled or either enable or disable it for that group you need to `include TimePilot::Features`.
+
+After including `TimePilot::Features` add: `is_pilot_group`. You can specify an `overridden_by: [:foo, :bar, ...]` to specify any relations that override the setting for the object itself. See the example below for `Team` and `User`.
+
 ```ruby
+# app/model/organization.rb
+class Organization
+  attr_accessor :id
+
+  include TimePilot::Features
+  is_pilot_group
+end
+
+# app/model/team.rb
+class Team
+  attr_accessor :organization_id, :id
+
+  include TimePilot::Features
+  is_pilot_group overridden_by: :organization
+end
+
+# app/model/user.rb
 class User
-  attr_reader :organization_id, :team_id
+  attr_accessor :organization_id, :team_id, :id
 
   include TimePilot::Features
   is_pilot_group overridden_by: [:organization, :team]
 end
+
+# app/model/person.rb
+class Person
+  attr_accessor :id
+
+  include TimePilot::Features
+  is_pilot_group
+end
 ```
 
-This allows you to invoke the following methods on a `User`:
+When you invoke `user.planning_enabled?`, TimePilot fill first check if the feature has been enabled for the organization with the ID obtained from `user.organization_id`. If that evaluates to `false`, TimePilot continues checking the feature, but now using `user.team_id`. Then, if that fails too, it checks whether the feature is enabled for the user itself.
+
+## Configuring Redis
+
+Most projects using Redis have a `$redis` variable defined. If that's not the case for your project, you can override this configuration in the configuration like this. You only have to do this if you don't have `$redis` defined in an initializer.
+
+```
+# config/initializers/time_pilot.rb
+TimePilot.configure do |c|
+  c.redis Redis.new(...)
+end
+```
+
+TimePilot assumes you put in an object that responds to `#sadd`, `#srem` and `#sismember`.
+
+# Usage
+
+The configuration above allows you to invoke the following methods on a `Organization`, `Team`, `User` and `Person`:
 
 ```ruby
 # Methods for feature 'planning'
@@ -30,4 +95,8 @@ user.disable_planning
 user.private_messaging_enabled?
 user.enable_private_messaging
 user.disable_private_messaging
+
+# The same methods can be invoked on an instance of Organization,
+# Team and Person provided the example above, since they all include
+# the `Features` module.
 ```
