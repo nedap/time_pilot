@@ -1,2 +1,3 @@
-require 'time_pilot/configuration'
-require 'time_pilot/time_pilot'
+require 'redis'
+require_relative 'time_pilot/time_pilot'
+require_relative 'time_pilot/configuration'

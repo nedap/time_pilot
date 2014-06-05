@@ -70,7 +70,7 @@ When you invoke `user.planning_enabled?`, TimePilot fill first check if the feat
 
 ## Configuring Redis
 
-Most projects using Redis have a `$redis` variable defined. If that's not the case for your project, you can override this configuration in the configuration like this. You only have to do this if you don't have `$redis` defined in an initializer.
+TimePilot uses `localhost:6379` by default for Redis. To connect to a Redis instance on a different port or host, provide a Redis client in `TimePilot.configure` block.
 
 ```
 # config/initializers/time_pilot.rb

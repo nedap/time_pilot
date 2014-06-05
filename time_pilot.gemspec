@@ -13,5 +13,6 @@ Gem::Specification.new do |s|
   s.email       = ['matthijs.langenberg@nedap.com', 'mark.oudeveldhuis@nedap.com']
   s.homepage    = ''
 
+  s.add_dependency 'redis', '>= 3.0.0'
   s.add_development_dependency "minitest"
 end

@@ -1,9 +1,5 @@
-require 'time_pilot'
-require 'minitest/spec'
+require_relative '../lib/time_pilot'
 require 'minitest/autorun'
-
-require 'redis'
-$redis = Redis.new
 
 class Company
   include TimePilot::Features
@@ -41,7 +37,7 @@ end
 
 describe TimePilot do
   before do
-    $redis.flushdb
+    TimePilot.redis.flushdb
     @acme = Company.new(1)
     @nedap = Company.new(2)
     @healthcare = Team.new(@nedap.id, 11)
@@ -51,13 +47,13 @@ describe TimePilot do
   end
 
   it 'defines a getter on company' do
-    $redis.sadd 'timepilot:planning:company_ids', @acme.id
+    TimePilot.redis.sadd 'timepilot:planning:company_ids', @acme.id
     @acme.planning_enabled?.must_equal true
   end
 
   it 'defines an enabler on company' do
     @nedap.enable_planning
-    $redis.sismember("timepilot:planning:company_ids", @nedap.id).must_equal true
+    TimePilot.redis.sismember("timepilot:planning:company_ids", @nedap.id).must_equal true
   end
 
   it 'defines a disabler on employee' do
@@ -68,13 +64,13 @@ describe TimePilot do
   end
 
   it 'defines a getter on team' do
-    $redis.sadd 'timepilot:planning:team_ids', @healthcare.id
+    TimePilot.redis.sadd 'timepilot:planning:team_ids', @healthcare.id
     @healthcare.planning_enabled?.must_equal true
   end
 
   it 'defines an enabler on team' do
     @retail.enable_planning
-    $redis.sismember("timepilot:planning:team_ids", @retail.id).must_equal true
+    TimePilot.redis.sismember("timepilot:planning:team_ids", @retail.id).must_equal true
   end
 
   it 'defines a disabler on team' do
@@ -85,13 +81,13 @@ describe TimePilot do
   end
 
   it 'defines a getter on employee' do
-    $redis.sadd 'timepilot:planning:employee_ids', @john.id
+    TimePilot.redis.sadd 'timepilot:planning:employee_ids', @john.id
     @john.planning_enabled?.must_equal true
   end
 
   it 'defines an enabler on employee' do
     @jane.enable_planning
-    $redis.sismember("timepilot:planning:employee_ids", @jane.id).must_equal true
+    TimePilot.redis.sismember("timepilot:planning:employee_ids", @jane.id).must_equal true
   end
 
   it 'defines a disabler on employee' do

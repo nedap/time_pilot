@@ -5,7 +5,7 @@ module TimePilot
 
     def initialize
       @features = []
-      @redis_store = $redis
+      @redis_store = Redis.new
     end
 
     def feature feature_name
