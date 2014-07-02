@@ -1,8 +1,10 @@
+require_relative 'lib/time_pilot/version'
+
 Gem::Specification.new do |s|
   s.name         = 'time_pilot'
   s.summary      = 'Configure enabled features for a specific set of users.'
   s.description  = ''
-  s.version      = '0.0.3'
+  s.version      = TimePilot::VERSION
   s.platform     = Gem::Platform::RUBY
   s.license      = 'MIT'
 
