@@ -15,5 +15,6 @@ Gem::Specification.new do |s|
   s.homepage    = 'https://github.com/nedap/time_pilot'
 
   s.add_dependency 'redis', '>= 3.0.0'
+  s.add_dependency 'activesupport', '>= 3.0.0'
   s.add_development_dependency "minitest"
 end

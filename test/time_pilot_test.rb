@@ -112,3 +112,14 @@ describe TimePilot do
     @jane.planning_enabled?.must_equal true
   end
 end
+
+class CamelCasedModel
+  include TimePilot::Features
+  is_pilot_group
+end
+
+describe TimePilot, 'converting CamelCase to camel_case' do
+  it do
+    CamelCasedModel.time_pilot_groups.must_equal ['camel_cased_model']
+  end
+end

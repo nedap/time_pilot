@@ -41,22 +41,22 @@ module TimePilot
     module ClassMethods
       attr_reader :time_pilot_groups
       def is_pilot_group options={}
-        @time_pilot_groups = Array(options[:overridden_by]).map { |e| e.to_s } + [self.name.downcase.to_s]
+        @time_pilot_groups = Array(options[:overridden_by]).map { |e| e.to_s } + [self.to_s.underscore]
       end
     end
 
     def pilot_enable_feature(feature_name)
-      TimePilot.redis.sadd TimePilot.key("#{feature_name}:#{self.class.to_s.downcase}_ids"), id
+      TimePilot.redis.sadd TimePilot.key("#{feature_name}:#{self.class.to_s.underscore}_ids"), id
     end
 
     def pilot_disable_feature(feature_name)
-      TimePilot.redis.srem TimePilot.key("#{feature_name}:#{self.class.to_s.downcase}_ids"), id
+      TimePilot.redis.srem TimePilot.key("#{feature_name}:#{self.class.to_s.underscore}_ids"), id
     end
 
     def pilot_feature_enabled?(feature_name)
       TimePilot.redis.pipelined {
         self.class.time_pilot_groups.each do |group|
-          method = group.to_s == self.class.to_s.downcase ? 'id' : group + '_id'
+          method = group.to_s == self.class.to_s.underscore ? 'id' : group + '_id'
           TimePilot.redis.sismember TimePilot.key("#{feature_name}:#{group}_ids"), send(method)
         end
       }.include? true
