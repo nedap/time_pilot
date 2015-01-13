@@ -35,6 +35,10 @@ TimePilot.configure do |c|
   c.feature 'planning'
 end
 
+TimePilot.configure do |c|
+  c.feature 'secret_feature'
+end
+
 describe TimePilot do
   before do
     TimePilot.redis.flushdb
@@ -44,6 +48,12 @@ describe TimePilot do
     @retail = Team.new(@nedap.id, 12)
     @john = Employee.new(@nedap.id, @healthcare.id, 21)
     @jane = Employee.new(@nedap.id, @healthcare.id, 22)
+  end
+
+  it 'allows multiple configure blocks to add features' do
+    TimePilot.features.must_equal ['planning', 'secret_feature']
+    @acme.planning_enabled?.must_equal false
+    @acme.secret_feature_enabled?.must_equal false
   end
 
   it 'defines a getter on company' do

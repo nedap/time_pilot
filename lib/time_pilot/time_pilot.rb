@@ -2,7 +2,7 @@ module TimePilot
   NAMESPACE = 'timepilot'
 
   def self.configure
-    @config = Configuration.new
+    @config ||= Configuration.new
     yield @config
     @config.features.each do |feature_name|
       Features.module_eval do
