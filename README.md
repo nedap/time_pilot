@@ -1,4 +1,4 @@
-# TimePilot ![Build Status](https://magnum.travis-ci.com/nedap/time_pilot.svg?token=xp5ywq16hRcpzRui8vVa&branch=master) ![Code Climate](https://codeclimate.com/repos/538c225ae30ba00d55006394/badges/1741b217ec9818699a37/gpa.png)
+# TimePilot [![Build Status](https://travis-ci.org/nedap/time_pilot.svg)](https://travis-ci.org/nedap/time_pilot) ![Code Climate](https://codeclimate.com/repos/538c225ae30ba00d55006394/badges/1741b217ec9818699a37/gpa.png)
 
 TimePilot is a RubyGem that makes it possible to define features that can be enabled for a certain group of users. It requires very little configuration, and is designed to work stand-alone on any object. TimePilot uses Redis for storage.
 
