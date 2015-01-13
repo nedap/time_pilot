@@ -79,6 +79,22 @@ TimePilot.configure do |c|
 end
 ```
 
+## Multiple configure blocks
+
+TimePilot allows you to specify more than one configure block. This allows you to specify features at multiple levels. For example, you could specify features in a Rails Engine located in a separate gem, as well as the host application. It's easy as this:
+
+```ruby
+# vendor/gems/.../config/initializers/time_pilot.rb
+TimePilot.configure do |c|
+  c.feature :this_could_be_my_rails_engine
+end
+
+# config/initializers/time_pilot.rb
+TimePilot.configure do |c|
+  c.feature :this_is_my_host_application
+end
+```
+
 TimePilot assumes you put in an object that responds to `#sadd`, `#srem` and `#sismember`.
 
 # Usage
