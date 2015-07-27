@@ -79,7 +79,7 @@ TimePilot.configure do |c|
 end
 ```
 
-TimePilot assumes you put in an object that responds to `#sadd`, `#srem` and `#sismember`.
+TimePilot assumes you put in an object that responds to `#sadd`, `#srem`, `#sismember` and `#scard`.
 
 ## Multiple configure blocks
 
@@ -96,6 +96,24 @@ TimePilot.configure do |c|
   c.feature :this_is_my_host_application
 end
 ```
+
+## TimePilot Web
+
+TimePilot provides a dashboard that is mountable inside a Rails app.
+```ruby
+# in config/initializers/time_pilot.rb
+require 'time_pilot/web'
+TimePilot::Web.use(Rack::Auth::Basic) do |user, password|
+  username == ENV["TIME_PILOT_USERNAME"] && password == ENV["TIME_PILOT_PASSWORD"]
+end
+
+# in routes.rb
+Application.routes.draw do
+  mount TimePilot::Web => '/time_pilot'
+end
+```
+
+`TimePilot::Web` is just a Rack app. You can use it outside Rails.
 
 # Usage
 
