@@ -8,8 +8,8 @@ module TimePilot
     end
 
     def call!(env)
-      req = Rack::Request.new(env)
-      case req.path_info
+      @request = Rack::Request.new(env)
+      case @request.path_info
       when '/'
         dashboard
       else
@@ -41,7 +41,11 @@ module TimePilot
     end
 
     def read_template(view)
-      File.read(File.join(__dir__, '..', '..', 'web', "#{view}.html.erb"))
+      File.read(File.join(__dir__, '..', '..', 'web', 'views', "#{view}.html.erb"))
+    end
+
+    def root_path
+      "#{@request.env['SCRIPT_NAME']}/"
     end
 
     class << self
@@ -61,6 +65,9 @@ module TimePilot
       def instance
         builder = Rack::Builder.new
         @middleware.each { |c, a, b| builder.use(c, *a, &b) }
+        builder.use Rack::Static,
+                    urls: ['/stylesheets'],
+                    root: File.join(__dir__, '..', '..', 'web', 'assets')
         builder.run new
         builder.to_app
       end
