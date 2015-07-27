@@ -43,6 +43,10 @@ module TimePilot
       def is_pilot_group options={}
         @time_pilot_groups = Array(options[:overridden_by]).map { |e| e.to_s } + [self.to_s.underscore]
       end
+
+      def pilot_feature_cardinality(feature_name)
+        TimePilot.redis.scard TimePilot.key("#{feature_name}:#{self.to_s.underscore}_ids")
+      end
     end
 
     def pilot_enable_feature(feature_name)

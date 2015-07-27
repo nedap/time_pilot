@@ -107,6 +107,14 @@ describe TimePilot do
     @jane.planning_enabled?.must_equal false
   end
 
+  it 'defines a cardinality count on the classes' do
+    @nedap.enable_planning
+    @john.enable_planning
+    @jane.enable_planning
+    Company.pilot_feature_cardinality(:planning).must_equal 1
+    Team.pilot_feature_cardinality(:planning).must_equal 0
+    Employee.pilot_feature_cardinality(:planning).must_equal 2
+  end
   specify 'company overrides team' do
     @nedap.enable_planning
     @retail.planning_enabled?.must_equal true
