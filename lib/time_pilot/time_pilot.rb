@@ -1,5 +1,17 @@
 module TimePilot
   NAMESPACE = 'timepilot'
+  @group_classes = []
+  @mutex = Mutex.new
+
+  def self.register_class(klass)
+    @mutex.synchronize do
+      @group_classes << klass
+    end
+  end
+
+  def self.group_classes
+    @group_classes
+  end
 
   def self.configure
     @config ||= Configuration.new
@@ -41,7 +53,12 @@ module TimePilot
     module ClassMethods
       attr_reader :time_pilot_groups
       def is_pilot_group options={}
+        TimePilot.register_class(self)
         @time_pilot_groups = Array(options[:overridden_by]).map { |e| e.to_s } + [self.to_s.underscore]
+      end
+
+      def pilot_feature_cardinality(feature_name)
+        TimePilot.redis.scard TimePilot.key("#{feature_name}:#{self.to_s.underscore}_ids")
       end
     end
 
