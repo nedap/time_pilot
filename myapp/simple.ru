@@ -35,4 +35,8 @@ jane.disable_planning
 jane.enable_private_messaging
 
 require 'time_pilot/web'
-run TimePilot::Web.new
+TimePilot::Web.use(Rack::Auth::Basic) do
+  true
+end
+
+run TimePilot::Web
