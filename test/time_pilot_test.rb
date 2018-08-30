@@ -59,7 +59,7 @@ describe TimePilot do
   it 'defines a getter on company' do
     TimePilot.redis.sadd 'timepilot:planning:company_ids', @acme.id
     @acme.planning_enabled?.must_equal true
-    @acme.planning_enabled.must_equal true
+    @acme.instance_variable_get("@planning_enabled").must_equal true
   end
 
   it 'defines an enabler on company' do
@@ -70,10 +70,10 @@ describe TimePilot do
   it 'defines a disabler on employee' do
     @nedap.enable_planning
     @nedap.planning_enabled?.must_equal true
-    @nedap.planning_enabled.must_equal true
+    @nedap.instance_variable_get("@planning_enabled").must_equal true
     @nedap.disable_planning
     @nedap.planning_enabled?.must_equal false
-    @nedap.planning_enabled.must_equal false
+    @nedap.instance_variable_get("@planning_enabled").must_equal false
   end
 
   it 'defines a getter on team' do
@@ -89,16 +89,16 @@ describe TimePilot do
   it 'defines a disabler on team' do
     @retail.enable_planning
     @retail.planning_enabled?.must_equal true
-    @retail.planning_enabled.must_equal true
+    @retail.instance_variable_get("@planning_enabled").must_equal true
     @retail.disable_planning
     @retail.planning_enabled?.must_equal false
-    @retail.planning_enabled.must_equal false
+    @retail.instance_variable_get("@planning_enabled").must_equal false
   end
 
   it 'defines a getter on employee' do
     TimePilot.redis.sadd 'timepilot:planning:employee_ids', @john.id
     @john.planning_enabled?.must_equal true
-    @john.planning_enabled.must_equal true
+    @john.instance_variable_get("@planning_enabled").must_equal true
   end
 
   it 'defines an enabler on employee' do
@@ -109,10 +109,10 @@ describe TimePilot do
   it 'defines a disabler on employee' do
     @jane.enable_planning
     @jane.planning_enabled?.must_equal true
-    @jane.planning_enabled.must_equal true
+    @jane.instance_variable_get("@planning_enabled").must_equal true
     @jane.disable_planning
     @jane.planning_enabled?.must_equal false
-    @jane.planning_enabled.must_equal false
+    @jane.instance_variable_get("@planning_enabled").must_equal false
   end
 
   it 'defines a cardinality count on the classes' do
@@ -133,19 +133,19 @@ describe TimePilot do
   specify 'company overrides team' do
     @nedap.enable_planning
     @retail.planning_enabled?.must_equal true
-    @retail.planning_enabled.must_equal true
+    @retail.instance_variable_get("@planning_enabled").must_equal true
   end
 
   specify 'team overrides employee' do
     @healthcare.enable_planning
     @john.planning_enabled?.must_equal true
-    @john.planning_enabled.must_equal true
+    @john.instance_variable_get("@planning_enabled").must_equal true
   end
 
   specify 'company overrides employee' do
     @nedap.enable_planning
     @jane.planning_enabled?.must_equal true
-    @jane.planning_enabled.must_equal true
+    @jane.instance_variable_get("@planning_enabled").must_equal true 
   end
 end
 
@@ -160,11 +160,50 @@ describe TimePilot, 'converting CamelCase to camel_case' do
   end
 end
 
-describe TimePilot, 'reduce redis load' do
-  it 'calls redis only once' do
-    TimePilot.redis.expect(:sismember, true, ['timepilot:planning:company_ids', @acme.id])
+describe TimePilot do
+  before do
+    @acme = Company.new(1)
+
+    @mock = MiniTest::Mock.new
+    TimePilot.configure do |config|
+      config.redis(@mock)
+    end
+  end
+
+  after do
+    TimePilot.configure do |config|
+      config.redis(Redis.new)
+    end
+  end
+
+  specify 'calls redis only once' do
+    @mock.expect(:pipelined, [true])
 
     @acme.planning_enabled?.must_equal true
+    # Call the feature a second time
+    # If it calls redis you will get
+    # MockExpectationError: No more expects available for :pipelined: []
+    @acme.planning_enabled?.must_equal true
+  end
+
+  specify 'does not call redis to get status after disabling' do
+    @mock.expect(:srem, true, ['timepilot:planning:company_ids', @acme.id])
+
+    @acme.disable_planning
+    # Call the feature again it should hit the instance variable
+    # If it calls redis you will get
+    # MockExpectationError: No more expects available for :pipelined: []
+    @acme.planning_enabled?.must_equal false
+  end
+
+  specify 'does not call redis to get status after enabling' do
+    @mock.expect(:sadd, true, ['timepilot:planning:company_ids', @acme.id])
+
+    @acme.enable_planning
+    # Call the feature again it should hit the instance variable
+    # If it calls redis you will get
+    # MockExpectationError: No more expects available for :pipelined: []
     @acme.planning_enabled?.must_equal true
   end
 end
+
