@@ -16,21 +16,23 @@ module TimePilot
   def self.configure
     @config ||= Configuration.new
     yield @config
-    @config.features.each { |f| define_feature_method(f) }
+    @config.features.each { |f| define_feature_methods(f) }
   end
 
-  def self.define_feature_method(feature_name)
+  def self.define_feature_methods(feature_name)
     Features.module_eval do
-      define_method "enable_#{feature_name}" do
-        pilot_enable_feature(feature_name)
-      end
+      unless method_defined?("enable_#{feature_name}")
+        define_method "enable_#{feature_name}" do
+          pilot_enable_feature(feature_name)
+        end
 
-      define_method "disable_#{feature_name}" do
-        pilot_disable_feature(feature_name)
-      end
+        define_method "disable_#{feature_name}" do
+          pilot_disable_feature(feature_name)
+        end
 
-      define_method "#{feature_name}_enabled?" do
-        pilot_feature_enabled?(feature_name)
+        define_method "#{feature_name}_enabled?" do
+          pilot_feature_enabled?(feature_name)
+        end
       end
     end
   end
