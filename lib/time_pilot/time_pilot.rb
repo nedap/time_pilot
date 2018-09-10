@@ -83,18 +83,25 @@ module TimePilot
 
     def pilot_feature_enabled?(feature_name)
       unless instance_variable_defined?("@#{feature_name}_enabled")
-        enabled = TimePilot.redis.pipelined do
-          self.class.time_pilot_groups.each do |group|
-            method = group.to_s == self.class.to_s.underscore ? 'id' : group + '_id'
-            TimePilot.redis.sismember TimePilot.key("#{feature_name}:#{group}_ids"), send(method)
-          end
-        end.include? true
-
-        instance_variable_set("@#{feature_name}_enabled", enabled)
+        instance_variable_set("@#{feature_name}_enabled",
+                              pilot_member_in_any_group?(feature_name))
       end
       instance_variable_get("@#{feature_name}_enabled")
     end
 
-  end
+    def pilot_member_in_any_group?(feature_name)
+      TimePilot.redis.pipelined do
+        self.class.time_pilot_groups.each do |group|
+          TimePilot.redis.sismember(
+            TimePilot.key("#{feature_name}:#{group}_ids"),
+            send(pilot_method_for_group(group))
+          )
+        end
+      end.include? true
+    end
 
+    def pilot_method_for_group(group_name)
+      group_name.to_s == self.class.to_s.underscore ? 'id' : group_name + '_id'
+    end
+  end
 end
