@@ -72,22 +72,36 @@ module TimePilot
     def pilot_enable_feature(feature_name)
       key_name = "#{feature_name}:#{self.class.to_s.underscore}_ids"
       TimePilot.redis.sadd TimePilot.key(key_name), id
+      instance_variable_set("@#{feature_name}_enabled", true)
     end
 
     def pilot_disable_feature(feature_name)
       key_name = "#{feature_name}:#{self.class.to_s.underscore}_ids"
       TimePilot.redis.srem TimePilot.key(key_name), id
+      instance_variable_set("@#{feature_name}_enabled", false)
     end
 
     def pilot_feature_enabled?(feature_name)
+      unless instance_variable_defined?("@#{feature_name}_enabled")
+        instance_variable_set("@#{feature_name}_enabled",
+                              pilot_member_in_any_group?(feature_name))
+      end
+      instance_variable_get("@#{feature_name}_enabled")
+    end
+
+    def pilot_member_in_any_group?(feature_name)
       TimePilot.redis.pipelined do
         self.class.time_pilot_groups.each do |group|
-          method = group.to_s == self.class.to_s.underscore ? 'id' : group + '_id'
-          TimePilot.redis.sismember TimePilot.key("#{feature_name}:#{group}_ids"), send(method)
+          TimePilot.redis.sismember(
+            TimePilot.key("#{feature_name}:#{group}_ids"),
+            send(pilot_method_for_group(group))
+          )
         end
       end.include? true
     end
 
+    def pilot_method_for_group(group_name)
+      group_name.to_s == self.class.to_s.underscore ? 'id' : group_name + '_id'
+    end
   end
-
 end
