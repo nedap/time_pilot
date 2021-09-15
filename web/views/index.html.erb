@@ -1,23 +1,25 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Time Pilot Web</title>
 
   <link rel="stylesheet" href="<%= root_path %>stylesheets/pure-min.css">
-  <style type="text/css">
-    h1 {
-      text-align: center;
-    }
-    body {
-      font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
-      font-weight: 300;
-    }
-    .centered {
-      margin-left: auto;
-      margin-right: auto;
-    }
+  <style >
+      h1 {
+          text-align: center;
+      }
+
+      body {
+          font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+          font-weight: 300;
+      }
+
+      .centered {
+          margin-left: auto;
+          margin-right: auto;
+      }
   </style>
 </head>
 <body>
@@ -26,20 +28,22 @@
     <h1>Time Pilot Web</h1>
     <table class="pure-table pure-table-horizontal pure-table-striped centered">
       <thead>
-        <tr>
-          <th>Feature</th><th>Group</th><th>Count</th>
-        </tr>
+      <tr>
+        <th>Feature</th>
+        <th>Group</th>
+        <th>Count</th>
+      </tr>
       </thead>
       <tbody>
-<% @total_count.each do |feature, groups| %>
-  <% groups.each do |group, count| %>
-        <tr>
-          <td><%= feature %></td>
-          <td><%= group %></td>
-          <td><%= count %></td>
-        </tr>
-  <% end %>
-<% end %>
+      <% @total_count.each do |feature, groups| %>
+        <% groups.each do |group, count| %>
+          <tr>
+            <td><%= feature %></td>
+            <td><%= group %></td>
+            <td><%= count %></td>
+          </tr>
+        <% end %>
+      <% end %>
       </tbody>
     </table>
   </div>
