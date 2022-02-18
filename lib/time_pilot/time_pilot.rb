@@ -90,9 +90,9 @@ module TimePilot
     end
 
     def pilot_member_in_any_group?(feature_name)
-      TimePilot.redis.pipelined do
+      TimePilot.redis.pipelined do |pipeline|
         self.class.time_pilot_groups.each do |group|
-          TimePilot.redis.sismember(
+          pipeline.sismember(
             TimePilot.key("#{feature_name}:#{group}_ids"),
             send(pilot_method_for_group(group))
           )
