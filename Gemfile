@@ -1,4 +1,4 @@
 source "http://rubygems.org"
 gem 'rake'
-gem 'redis'
+gem 'redis', '>= 4.8.0'
 gemspec
