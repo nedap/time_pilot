@@ -71,13 +71,13 @@ module TimePilot
 
     def pilot_enable_feature(feature_name)
       key_name = "#{feature_name}:#{self.class.to_s.underscore}_ids"
-      TimePilot.redis.sadd TimePilot.key(key_name), id
+      TimePilot.redis.sadd? TimePilot.key(key_name), id
       instance_variable_set("@#{feature_name}_enabled", true)
     end
 
     def pilot_disable_feature(feature_name)
       key_name = "#{feature_name}:#{self.class.to_s.underscore}_ids"
-      TimePilot.redis.srem TimePilot.key(key_name), id
+      TimePilot.redis.srem? TimePilot.key(key_name), id
       instance_variable_set("@#{feature_name}_enabled", false)
     end
 

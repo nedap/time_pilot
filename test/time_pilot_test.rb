@@ -62,7 +62,7 @@ describe TimePilot do
   end
 
   it "defines a getter on company" do
-    TimePilot.redis.sadd "timepilot:planning:company_ids", @acme.id
+    TimePilot.redis.sadd? "timepilot:planning:company_ids", @acme.id
     _(@acme.planning_enabled?).must_equal true
     _(@acme.instance_variable_get("@planning_enabled")).must_equal true
   end
@@ -82,7 +82,7 @@ describe TimePilot do
   end
 
   it "defines a getter on team" do
-    TimePilot.redis.sadd "timepilot:planning:team_ids", @healthcare.id
+    TimePilot.redis.sadd? "timepilot:planning:team_ids", @healthcare.id
     _(@healthcare.planning_enabled?).must_equal true
   end
 
@@ -101,7 +101,7 @@ describe TimePilot do
   end
 
   it "defines a getter on employee" do
-    TimePilot.redis.sadd "timepilot:planning:employee_ids", @john.id
+    TimePilot.redis.sadd? "timepilot:planning:employee_ids", @john.id
     _(@john.planning_enabled?).must_equal true
     _(@john.instance_variable_get("@planning_enabled")).must_equal true
   end
@@ -192,7 +192,7 @@ describe TimePilot do
   end
 
   specify "does not call redis to get status after disabling" do
-    @mock.expect(:srem, true, ["timepilot:planning:company_ids", @acme.id])
+    @mock.expect(:srem?, true, ["timepilot:planning:company_ids", @acme.id])
 
     @acme.disable_planning
     # Call the feature again it should hit the instance variable
@@ -202,7 +202,7 @@ describe TimePilot do
   end
 
   specify "does not call redis to get status after enabling" do
-    @mock.expect(:sadd, true, ["timepilot:planning:company_ids", @acme.id])
+    @mock.expect(:sadd?, true, ["timepilot:planning:company_ids", @acme.id])
 
     @acme.enable_planning
     # Call the feature again it should hit the instance variable
