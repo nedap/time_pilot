@@ -134,3 +134,39 @@ user.disable_private_messaging
 # Team and Person provided the example above, since they all include
 # the `Features` module.
 ```
+
+# Publish
+
+The following steps are needed to publish time_pilot:
+
+* Bump version in `version.rb`
+* Commit new version with:
+
+  ```
+  git commit --message "Bump to version $VERSION"
+  ```
+* Tag the new version:
+
+  ```
+  git tag $VERSION
+  ```
+* Push the bump commit and tag:
+
+  ```
+  git push --tags
+  ```
+* Build the gem:
+
+  ```
+  gem build time_pilot.gemspec
+  ```
+* Push to gemfury:
+
+  ```
+  fury push time_pilot-${VERSION}.gem --as=nedap-healthcare
+  ```
+* Push to Rubygems:
+
+  ```
+  gem push time_pilot-${VERSION}.gem
+  ```
