@@ -2,6 +2,11 @@
 
 TimePilot is a RubyGem that makes it possible to define features that can be enabled for a certain group of users. It requires very little configuration, and is designed to work stand-alone on any object. TimePilot uses Redis for storage.
 
+> [!IMPORTANT]  
+> TimePilot is not multi-tenant or multi-database aware. Features are stored in Redis using a key generated from 
+> the class name and ID of the object; if this ID can be the same across databases (i.e. it is not a UUID) then
+> you will run into duplicate keys.
+
 ## Installation
 
 Add this line to your application's Gemfile:
