@@ -169,7 +169,7 @@ describe TimePilot do
   before do
     @acme = Company.new(1)
 
-    @mock = MiniTest::Mock.new
+    @mock = Minitest::Mock.new
     TimePilot.configure do |config|
       config.redis(@mock)
     end
